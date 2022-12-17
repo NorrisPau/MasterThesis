@@ -22,7 +22,6 @@ services:
     ports:
       - 7900:7900
 
-
   selenium-hub:
     image: selenium/hub:latest
     container_name: selenium-hub
