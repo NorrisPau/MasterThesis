@@ -37,13 +37,20 @@ while True:
     if re.match(token_RE, local_storage):
         fb_token = re.search(token_RE, local_storage).group("token")
         print(f'FOUND TOKEN {fb_token} in {local_storage}')
+        javascript_fetch("https://api.gotinder.com/v2/matches?count=60&locale=en&message=1&page_token=")
         driver.quit()
         break
     elif max_retries < 1:
+        javascript_fetch("https://api.gotinder.com/v2/matches?count=60&locale=en&message=1&page_token=")
         driver.quit()
         break
     else:
         time.sleep(10)
         max_retries = max_retries - 1
         print(f'DEBUG \n PAGE: {driver.current_url} \n LOCAL STORAGE: {local_storage}') 
+
+def javascript_fetch(url):
+    print(str(driver.execute_script("fetch(" + url + ").then(function(response) { return response.json();}).catch(function(err) { return err )});)")))
+    
+
 
