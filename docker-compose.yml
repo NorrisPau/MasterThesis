@@ -11,7 +11,9 @@ services:
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
     ports:
       - 7900:7900
-
+    volumes:
+      - ./novnc/index.html:/opt/bin/noVNC/index.html
+      - ./novnc/bg.png:/usr/share/images/fluxbox/ubuntu-light.png
 
 #  firefox:
 #    image: selenium/node-firefox:beta
