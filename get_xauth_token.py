@@ -12,8 +12,8 @@ if enable_stealth:
     options.add_argument("start-maximized")
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
     options.add_experimental_option('useAutomationExtension', False)
-    options.addArguments("--no-sandbox");
-    options.addArguments("--disable-dev-shm-usage");
+    options.add_argument("--no-sandbox");
+    options.add_argument("--disable-dev-shm-usage");
 
 
 driver = webdriver.Remote(command_executor='http://localhost:4444/wd/hub', options=options)
