@@ -48,8 +48,7 @@ def get_messages(xauth_token):
         match_id = match["id"]
         match_name = match["person"]["name"]
         match_message_data = python_fetch(f'https://api.gotinder.com/v2/matches/{match_id}/messages?count=100&locale=en', xauth_token).json()
-        match_messages.append({"Person": match, "Messages": match_message_data})
-        print(f'{match_id} | {match_name} | {match_messages}')
+        match_messages.append({"Person": match, "Messages": match_message_data['data']})
     
     return match_messages
 
