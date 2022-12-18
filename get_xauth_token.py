@@ -5,27 +5,12 @@ import re
 import requests
 import uuid
 
+from tinder_api import get_messages
+
 UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.53 Safari/537.36'
 token_RE = "'TinderWeb\/APIToken': '(?P<token>([\w-])+)'"
 max_retries = 30
 enable_stealth = True
-
-def give_me_some_random_id():
-    # That's a really nice UUID you have there
-    # https://www.youtube.com/watch?v=nSsLNkFoHoU
-    return str(uuid.uuid4())
-
-def python_fetch(url, auth_token):
-    # More reliable
-    # Less stealth
-    headers = {'User-Agent': UA,'Accept': 'application/json','Accept-Language': 'en,en-US','Referer': 'https://tinder.com/','app-session-time-elapsed': '2069','app-version': '1035600','tinder-version': '3.56.0','user-session-time-elapsed': '1850','x-supported-image-formats': 'webp,jpeg','platform': 'web','support-short-video': '1','Origin': 'https://tinder.com','Sec-Fetch-Dest': 'empty','Sec-Fetch-Mode': 'cors','Sec-Fetch-Site': 'cross-site','Connection': 'keep-alive',
-                'X-Auth-Token': auth_token,
-                'app-session-id': give_me_some_random_id(),
-                'persistent-device-id': give_me_some_random_id(),
-                'user-session-id': give_me_some_random_id(),}
-    response = requests.get(url, headers=headers)
-    time.sleep(1)
-    return response
 
 def javascript_fetch(url, auth_token):
     # Less reliable
@@ -55,39 +40,15 @@ if enable_stealth:
 # driver.get("https://bot.sannysoft.com/")
 driver.get("http://www.tinder.com")
 
-matches = []
-match_messages = []
-
 while True:
     local_storage = str(driver.execute_script("return window.localStorage;"))
     xauth_token = re.search(token_RE, local_storage)
     if xauth_token:
         xauth_token = xauth_token.group("token")
         print(f'FOUND TOKEN {xauth_token} on {driver.current_url}')
-
-        print("Fetching Initial Matches")
-        # messages = 0 for uncontacted
-        match_data = python_fetch("https://api.gotinder.com/v2/matches?locale=en&count=60&message=1&is_tinder_u=false", xauth_token).json()
-        for match in match_data["data"]["matches"]:
-            matches.append(match)
-
-        # Paginate for people with more than 60 Matches
-        while True:
-            if "next_page_token" in match_data["data"]:
-                next_token = match_data["data"]["next_page_token"]
-                print("Getting next page of matches", next_token)
-                match_data = python_fetch("https://api.gotinder.com/v2/matches?locale=en&count=60&message=1&is_tinder_u=false&page_token="+next_token, xauth_token).json()
-                for match in match_data["data"]["matches"]:
-                    matches.append(match)
-            else:
-                break
-
-        for match in matches:
-            match_id = match["id"]
-            match_name = match["person"]["name"]
-            match_message_data = python_fetch(f'https://api.gotinder.com/v2/matches/{match_id}/messages?count=100&locale=en', xauth_token).json()
-            match_messages.append({"Person": match, "Messages": match_message_data})
-            print(f'{match_id} | {match_name} | {match_messages}')
+ 
+        # OR JUST CALL tinder_api.py instead       
+        get_messages(xauth_token)
 
         driver.quit()
         break
@@ -99,5 +60,3 @@ while True:
         max_retries = max_retries - 1
         print(f'DEBUG \n PAGE: {driver.current_url} \n LOCAL STORAGE: {local_storage}') 
 
-print(matches)
-print(match_messages)
